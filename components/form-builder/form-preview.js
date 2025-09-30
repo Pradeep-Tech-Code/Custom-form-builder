@@ -3,6 +3,7 @@
 import { useForm } from "@tanstack/react-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { AlertCircle, CheckCircle2, Send } from "lucide-react"
@@ -11,26 +12,53 @@ import { FieldRenderer } from "./field-renderer"
 export function FormPreview({ fields }) {
   const form = useForm({
     defaultValues: fields.reduce((acc, field) => {
-      let initialValue = ""
-      if (field.type === "checkbox") {
-        initialValue = []
-      } else if (field.type === "select" && field.validation?.multiple) {
-        initialValue = [] // multi-select starts as array
-      } else if (field.type === "file") {
-        initialValue = null
-      } else if (field.type === "location") {
-        initialValue = {}
-      } else if (field.type === "phone") {
-        initialValue = {} // { country, number }
-      }
-      acc[field.id] = initialValue
+      acc[field.id] =
+        field.type === "checkbox" || (field.type === "select" && field.validation?.multiple)
+          ? []
+          : field.type === "file"
+            ? null
+            : field.type === "location"
+              ? {}
+              : field.type === "phone"
+                ? {} // phone stores { country, number }
+                : ""
       return acc
     }, {}),
     onSubmit: async ({ value }) => {
+      // Simulate form submission
       console.log("Form submitted:", value)
-      alert("Form submitted successfully! Check the console for values.")
+      toast({ title: "Submitted", description: "Form submitted successfully." })
     },
   })
+
+  const { toast } = useToast()
+
+  const base64urlEncode = (input) => {
+    const b64 = typeof window !== "undefined" ? window.btoa(input) : ""
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+  }
+
+  const handleGenerateLink = async () => {
+    try {
+      const payload = { fields }
+      const json = JSON.stringify(payload)
+      const base64 = base64urlEncode(encodeURIComponent(json))
+      const origin = typeof window !== "undefined" ? window.location.origin : ""
+      const url = `${origin}/p/${base64}`
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url)
+        toast({ title: "Link copied", description: "Public form link copied to clipboard." })
+      } else {
+        const manual = prompt("Copy the public link:", url)
+        if (manual !== null) {
+          toast({ title: "Link ready", description: "You can share the copied link." })
+        }
+      }
+    } catch (e) {
+      console.error("Failed to generate link", e)
+      toast({ title: "Failed to generate link", variant: "destructive" })
+    }
+  }
 
   const PHONE_COUNTRIES = {
     US: { dial: "+1", len: 10 },
@@ -45,7 +73,7 @@ export function FormPreview({ fields }) {
 
     // Required validation
     if (field.required) {
-      if (field.type === "checkbox") {
+      if (field.type === "checkbox" || (field.type === "select" && field.validation?.multiple)) {
         if (!Array.isArray(value) || value.length === 0) {
           errors.push("This field is required")
         }
@@ -68,10 +96,6 @@ export function FormPreview({ fields }) {
           errors.push("Please select a country code")
         } else if (!v.number || String(v.number).trim() === "") {
           errors.push("Please enter a phone number")
-        }
-      } else if (field.type === "select" && field.validation?.multiple) {
-        if (!Array.isArray(value) || value.length === 0) {
-          errors.push("Please select at least one option")
         }
       } else if (!value || (typeof value === "string" && value.trim() === "")) {
         errors.push("This field is required")
@@ -223,17 +247,21 @@ export function FormPreview({ fields }) {
                       const errors = validateField(field, value)
                       return errors.length > 0 ? errors[0] : undefined
                     },
+                    onSubmit: ({ value }) => {
+                      const errors = validateField(field, value)
+                      return errors.length > 0 ? errors[0] : undefined
+                    },
                   }}
                 >
                   {(fieldApi) => (
-                    <div className="space-y-2">
-                      <FieldRenderer field={field} value={fieldApi.state.value} onChange={fieldApi.handleChange} />
-                      {fieldApi.state.meta.errors.length > 0 && (
-                        <div className="flex items-center gap-2 text-sm text-destructive">
-                          <AlertCircle className="h-4 w-4" />
-                          {fieldApi.state.meta.errors[0]}
-                        </div>
-                      )}
+                    <div className="space-y-1">
+                      <FieldRenderer
+                        field={field}
+                        value={fieldApi.state.value}
+                        onChange={fieldApi.handleChange}
+                        invalid={fieldApi.state.meta.errors.length > 0}
+                        error={fieldApi.state.meta.errors.length > 0 ? fieldApi.state.meta.errors[0] : undefined}
+                      />
                     </div>
                   )}
                 </form.Field>
@@ -247,14 +275,19 @@ export function FormPreview({ fields }) {
                   required
                 </div>
 
-                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-                  {([canSubmit, isSubmitting]) => (
-                    <Button type="submit" disabled={!canSubmit} className="gap-2">
-                      <Send className="h-4 w-4" />
-                      {isSubmitting ? "Submitting..." : "Submit Form"}
-                    </Button>
-                  )}
-                </form.Subscribe>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="secondary" onClick={handleGenerateLink}>
+                    Generate Link
+                  </Button>
+                  <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                    {([canSubmit, isSubmitting]) => (
+                      <Button type="submit" disabled={!canSubmit} className="gap-2">
+                        <Send className="h-4 w-4" />
+                        {isSubmitting ? "Submitting..." : "Submit Form"}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                </div>
               </div>
             </form>
           </CardContent>

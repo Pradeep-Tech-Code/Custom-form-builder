@@ -465,6 +465,41 @@ export function FieldConfigPanel({ field, onUpdateField }) {
           </Card>
         )} */}
 
+        {/* Select: Multiple toggle (quick access) */}
+        {field.type === "select" && (
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardHeader className="px-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Selection Mode
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-0 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="field-multiple-select" className="text-sm font-medium">
+                  Allow Multiple Selection
+                </Label>
+                <Switch
+                  id="field-multiple-select"
+                  checked={field.validation?.multiple || false}
+                  onCheckedChange={(checked) =>
+                    onUpdateField(field.id, {
+                      validation: {
+                        ...field.validation,
+                        multiple: checked,
+                      },
+                    })
+                  }
+                />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {field.validation?.multiple
+                  ? "Users can select multiple options from the dropdown"
+                  : "Users can select only one option from the dropdown"}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Advanced Settings */}
         {/* <Card className="border-0 shadow-none bg-transparent">
           <CardHeader className="px-0 pb-3">

@@ -1,77 +1,90 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Updated to a vibrant professional color scheme with blue primary and orange accents */
+  /* Professional Light Theme - Enhanced */
   --background: #ffffff;
   --foreground: #1a1a1a;
-  --card: #f8fafc;
+  --card: #fafbfc;
   --card-foreground: #1a1a1a;
   --popover: #ffffff;
   --popover-foreground: #1a1a1a;
   --primary: #2563eb; /* Professional blue */
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
+  --secondary: #f8fafc;
   --secondary-foreground: #475569;
-  --muted: #f8fafc;
+  --muted: #f1f5f9;
   --muted-foreground: #64748b;
-  --accent: #f97316; /* Vibrant orange accent */
+  --accent: #3b82f6; /* Vibrant blue accent */
   --accent-foreground: #ffffff;
-  --destructive: #ef4444;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e2e8f0;
   --input: #ffffff;
   --ring: #2563eb;
   --chart-1: #2563eb; /* Blue */
-  --chart-2: #f97316; /* Orange */
-  --chart-3: #8b5cf6; /* Purple */
-  --chart-4: #10b981; /* Green */
-  --chart-5: #f59e0b; /* Amber */
-  --radius: 0.5rem;
-  --sidebar: #1e293b;
-  --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #3b82f6;
+  --chart-2: #059669; /* Emerald */
+  --chart-3: #7c3aed; /* Violet */
+  --chart-4: #dc2626; /* Red */
+  --chart-5: #d97706; /* Amber */
+  --radius: 0.75rem;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #475569;
+  --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #f1f5f9;
-  --sidebar-border: #334155;
-  --sidebar-ring: #3b82f6;
+  --sidebar-accent: #e2e8f0;
+  --sidebar-accent-foreground: #1e293b;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #2563eb;
+  
+  /* New enhanced variables */
+  --success: #059669;
+  --warning: #d97706;
+  --info: #0ea5e9;
+  --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  --gradient-secondary: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .dark {
-  /* Enhanced dark mode with vibrant blue and orange accents */
+  /* Clean Dark Mode */
   --background: #0f172a;
   --foreground: #f1f5f9;
   --card: #1e293b;
   --card-foreground: #f1f5f9;
   --popover: #1e293b;
   --popover-foreground: #f1f5f9;
-  --primary: #3b82f6; /* Bright blue */
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
   --secondary: #334155;
   --secondary-foreground: #cbd5e1;
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
-  --accent: #fb923c; /* Bright orange */
+  --accent: #60a5fa;
   --accent-foreground: #ffffff;
-  --destructive: #f87171;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --border: #334155;
   --input: #1e293b;
   --ring: #3b82f6;
-  --chart-1: #3b82f6; /* Bright blue */
-  --chart-2: #fb923c; /* Bright orange */
-  --chart-3: #a78bfa; /* Bright purple */
-  --chart-4: #34d399; /* Bright green */
-  --chart-5: #fbbf24; /* Bright amber */
-  --radius: 0.5rem;
+  --chart-1: #3b82f6;
+  --chart-2: #10b981;
+  --chart-3: #8b5cf6;
+  --chart-4: #ef4444;
+  --chart-5: #f59e0b;
+  --radius: 0.75rem;
   --sidebar: #1e293b;
-  --sidebar-foreground: #f1f5f9;
+  --sidebar-foreground: #cbd5e1;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-accent-foreground: #cbd5e1;
   --sidebar-border: #334155;
   --sidebar-ring: #3b82f6;
 }
@@ -81,65 +94,332 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  
+  /* Enhanced scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-radius: var(--radius);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: var(--radius);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
   }
 }
 
-/* Enhanced custom styles with more vibrant colors for better visual hierarchy */
+/* Enhanced custom styles with professional light theme */
 @layer components {
   .form-builder-sidebar {
-    @apply bg-gradient-to-b from-blue-50 to-indigo-100 border-r border-blue-200 shadow-lg;
+    @apply bg-gradient-to-b from-slate-50 to-blue-50/30 border-r border-slate-200 shadow-sm backdrop-blur-sm;
   }
 
   .form-builder-header {
-    @apply bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 border-b border-blue-300 shadow-lg;
+    @apply bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 border-b border-blue-300/50 shadow-lg backdrop-blur-md;
   }
 
   .field-type-button {
-    @apply hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 border border-transparent bg-white/50 hover:shadow-md;
+    @apply hover:bg-white hover:border-blue-200 hover:shadow-md transition-all duration-200 border border-transparent bg-white/70 backdrop-blur-sm;
   }
 
   .field-type-button:hover .field-icon {
-    @apply text-blue-700;
+    @apply text-blue-600 scale-110;
   }
 
   .form-canvas {
-    @apply bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-50;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/20;
   }
 
   .config-panel {
-    @apply bg-gradient-to-b from-orange-50 via-amber-50 to-yellow-50 border-l border-orange-200 shadow-lg;
+    @apply bg-gradient-to-b from-white to-slate-50/80 border-l border-slate-200 shadow-sm backdrop-blur-sm;
   }
 
-  /* Added main container background override */
+  /* Main container backgrounds */
   .form-builder-main {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50/10 to-indigo-50/10;
   }
 
-  /* Fixed select dropdown styling to prevent transparency issues */
+  /* Enhanced card styles */
+  .card-enhanced {
+    @apply bg-white/80 backdrop-blur-sm border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* Professional button variants */
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 border border-blue-500 text-white shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-white/80 hover:bg-white border border-slate-300 text-slate-700 shadow-sm hover:shadow-md backdrop-blur-sm transition-all duration-200;
+  }
+
+  /* Enhanced input styles */
+  .input-enhanced {
+    @apply bg-white border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm;
+  }
+
+  /* Badge variants */
+  .badge-primary {
+    @apply bg-blue-100 text-blue-700 border border-blue-200;
+  }
+
+  .badge-secondary {
+    @apply bg-slate-100 text-slate-700 border border-slate-300;
+  }
+
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-700 border border-emerald-200;
+  }
+
+  .badge-warning {
+    @apply bg-amber-100 text-amber-700 border border-amber-200;
+  }
+
+  /* Select dropdown enhancements - FIXED BACKGROUND */
   .select-content {
-    @apply bg-popover border border-border shadow-lg z-50;
+    @apply bg-white border border-slate-200 shadow-lg backdrop-blur-sm;
   }
 
   .select-item {
-    @apply bg-popover hover:bg-accent hover:text-accent-foreground cursor-pointer;
+    @apply bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer transition-colors duration-150;
+  }
+
+  /* Drag and drop enhancements */
+  .drag-overlay {
+    @apply bg-blue-50/50 border-2 border-dashed border-blue-300 rounded-lg backdrop-blur-sm;
+  }
+
+  .field-item-dragging {
+    @apply opacity-60 scale-95 rotate-1 shadow-lg;
+  }
+
+  /* Focus states */
+  .focus-enhanced:focus {
+    @apply outline-none ring-2 ring-blue-500/20 ring-offset-2 ring-offset-white transition-all duration-200;
   }
 }
 
-/* Added specific fixes for select dropdown visibility */
+/* Enhanced component-specific styles */
+@layer utilities {
+  .glass-effect {
+    @apply bg-white/70 backdrop-blur-md border border-white/20;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px -5px rgb(59 130 246 / 0.15);
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+}
+
+.input-error {
+  @apply border-red-500 text-red-500 placeholder-red-500 focus:border-red-500 focus:ring-red-500/20;
+}
+
+.select-error {
+  @apply border-red-500 text-red-500;
+}
+
+.text-error {
+  @apply text-red-500;
+}
+
+/* Placeholder color for error states */
+::placeholder {
+  color: #9ca3af;
+}
+
+.input-enhanced:invalid,
+.input-enhanced.error {
+  @apply border-red-500 text-red-500;
+}
+
+/* Specific placeholder color for error states */
+.input-enhanced.error::placeholder {
+  color: #ef4444;
+  opacity: 0.8;
+}
+
+/* Enhanced red color palette for errors */
+:root {
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-200: #fecaca;
+  --error-300: #fca5a5;
+  --error-400: #f87171;
+  --error-500: #ef4444;
+  --error-600: #dc2626;
+  --error-700: #b91c1c;
+  --error-800: #991b1b;
+  --error-900: #7f1d1d;
+}
+
+/* Smooth transitions for error states */
+.input-enhanced,
+.select-trigger,
+.textarea-enhanced {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for error fields */
+.input-enhanced.error:focus {
+  @apply border-red-500 ring-2 ring-red-500/20;
+}
+
+.select-trigger.error:focus {
+  @apply border-red-500 ring-2 ring-red-500/20;
+}
+
+
+/* FIXED: Enhanced select dropdown styling with solid backgrounds */
 [data-radix-select-content] {
-  background-color: hsl(var(--popover)) !important;
-  border: 1px solid hsl(var(--border)) !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  background-color: white !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  border-radius: 0.75rem !important;
   z-index: 50 !important;
+  backdrop-filter: blur(8px) !important;
+  padding: 4px !important;
+}
+
+[data-radix-select-viewport] {
+  background-color: white !important;
+  border-radius: 0.5rem !important;
 }
 
 [data-radix-select-item] {
-  background-color: transparent !important;
+  background-color: white !important;
+  border-radius: 0.5rem !important;
+  margin: 2px !important;
+  color: #374151 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  padding: 8px 12px !important;
 }
 
 [data-radix-select-item]:hover,
 [data-radix-select-item][data-highlighted] {
-  background-color: hsl(var(--accent)) !important;
-  color: hsl(var(--accent-foreground)) !important;
+  background-color: #eff6ff !important;
+  color: #1e40af !important;
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+[data-radix-select-item][data-state="checked"] {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  font-weight: 500 !important;
+}
+
+/* Fix for Command component (used in multiple select) */
+[data-radix-command-list] {
+  background-color: white !important;
+  border-radius: 0.75rem !important;
+}
+
+[data-radix-command-item] {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+[data-radix-command-item]:hover,
+[data-radix-command-item][data-selected] {
+  background-color: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+/* Enhanced form field animations */
+.field-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.field-hover {
+  @apply hover:shadow-md hover:border-blue-300/50 hover:translate-y-[-2px];
+}
+
+/* Professional loading states */
+.skeleton {
+  @apply bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 animate-pulse;
+}
+
+/* Enhanced tooltip styles */
+[data-radix-tooltip-content] {
+  @apply bg-slate-800 text-white px-3 py-2 rounded-md text-sm font-medium shadow-lg border border-slate-700 !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Custom scrollbar for specific elements */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 #f1f5f9;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 0.75rem;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 0.75rem;
+}
+
+/* Print styles for form export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+}
+
+/* Additional fixes for specific select components */
+.select-trigger {
+  background-color: white !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.select-trigger:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2) !important;
+}
+
+/* Fix for multiple select popover */
+[role="dialog"] [data-radix-select-content],
+[role="dialog"] [data-radix-command-list] {
+  background-color: white !important;
+}
+
+/* Ensure all dropdowns have solid white background */
+.SelectContent,
+.CommandList,
+.PopoverContent {
+  background-color: white !important;
 }

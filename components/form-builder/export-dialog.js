@@ -29,7 +29,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 export function GeneratedForm() {
   const form = useForm({
     defaultValues: {
-${fields.map((field) => `      ${field.id}: ${field.type === "checkbox" ? "[]" : '""'}`).join(",\n")}
+${fields
+  .map(
+    (field) =>
+      `      ${field.id}: ${
+        field.type === "checkbox" || (field.type === "select" && field.validation?.multiple) ? "[]" : '""'
+      }`,
+  )
+  .join(",\n")}
     },
     onSubmit: async ({ value }) => {
       console.log("Form submitted:", value)
@@ -92,6 +99,37 @@ ${fields
             />`
 
       case "select":
+        if (Boolean(JSON.parse(JSON.stringify(!!fields.find((f) => f.id === field.id)?.validation?.multiple)))) {
+          return `${label}
+            <div className="space-y-2 border border-input rounded-md bg-input p-2">
+              <div className="text-sm text-muted-foreground mb-1">
+                {Array.isArray(fieldApi.state.value) && fieldApi.state.value.length > 0
+                  ? \`\${fieldApi.state.value.length} selected\`
+                  : "${field.placeholder || "Select options"}"}
+              </div>
+${(field.options || [])
+  .filter((option) => option && option.trim() !== "")
+  .map(
+    (option, index) => `              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="${field.id}-${index}"
+                  checked={Array.isArray(fieldApi.state.value) ? fieldApi.state.value.includes("${option}") : false}
+                  onCheckedChange={(checked) => {
+                    const current = Array.isArray(fieldApi.state.value) ? fieldApi.state.value : []
+                    if (checked) {
+                      fieldApi.handleChange([...current, "${option}"])
+                    } else {
+                      fieldApi.handleChange(current.filter(v => v !== "${option}"))
+                    }
+                  }}
+                />
+                <Label htmlFor="${field.id}-${index}" className="text-sm font-normal cursor-pointer">${option}</Label>
+              </div>`,
+  )
+  .join("\n")}
+            </div>`
+        }
+
         return `${label}
             <Select value={fieldApi.state.value} onValueChange={fieldApi.handleChange}>
               <SelectTrigger>
@@ -154,24 +192,34 @@ ${field.options
         title: "Generated Form",
         type: "object",
         properties: fields.reduce((acc, field) => {
-          const fieldSchema = {
-            type: field.type === "number" ? "number" : field.type === "checkbox" ? "array" : "string",
-            title: field.label,
-            ...(field.placeholder && { description: field.placeholder }),
-            ...(field.required && { required: true }),
-            ...(field.options && { enum: field.options }),
-            ...(field.validation?.min && { minimum: field.validation.min }),
-            ...(field.validation?.max && { maximum: field.validation.max }),
+          let fieldSchema
+
+          if (field.type === "number") {
+            fieldSchema = { type: "number", title: field.label }
+          } else if (field.type === "checkbox" || (field.type === "select" && field.validation?.multiple)) {
+            fieldSchema = {
+              type: "array",
+              title: field.label,
+              items: { type: "string", ...(field.options ? { enum: field.options } : {}) },
+              uniqueItems: true,
+            }
+          } else {
+            fieldSchema = {
+              type: "string",
+              title: field.label,
+              ...(field.options ? { enum: field.options } : {}),
+            }
           }
 
-          // Only add pattern if it exists and is valid
+          if (field.placeholder) fieldSchema.description = field.placeholder
+          if (field.validation?.min != null) fieldSchema.minimum = field.validation.min
+          if (field.validation?.max != null) fieldSchema.maximum = field.validation.max
+
           if (field.validation?.pattern && field.validation.pattern.trim() !== "") {
             try {
-              // Test if the pattern is valid
               new RegExp(field.validation.pattern.trim())
               fieldSchema.pattern = field.validation.pattern.trim()
             } catch (e) {
-              // Skip invalid patterns
               console.warn("Skipping invalid regex pattern in export:", field.validation.pattern)
             }
           }
@@ -189,7 +237,7 @@ ${field.options
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-visible">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Code className="h-5 w-5" />
@@ -197,14 +245,14 @@ ${field.options
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="react" className="flex-1 overflow-visible">
+        <Tabs defaultValue="react" className="flex-1 overflow-hidden">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="react">React Component</TabsTrigger>
             <TabsTrigger value="json">JSON Schema</TabsTrigger>
             <TabsTrigger value="config">Configuration</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="react" className="mt-4 overflow-visible">
+          <TabsContent value="react" className="mt-4 overflow-hidden">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -227,7 +275,7 @@ ${field.options
             </div>
           </TabsContent>
 
-          <TabsContent value="json" className="mt-4 overflow-visible">
+          <TabsContent value="json" className="mt-4 overflow-hidden">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -250,7 +298,7 @@ ${field.options
             </div>
           </TabsContent>
 
-          <TabsContent value="config" className="mt-4 overflow-visible">
+          <TabsContent value="config" className="mt-4 overflow-hidden">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
