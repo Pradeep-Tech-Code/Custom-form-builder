@@ -55,7 +55,9 @@ export function FieldConfigPanel({ field, onUpdateField }) {
   }
 
   const needsOptions = ["select", "checkbox", "radio"].includes(field.type)
-  const supportsValidation = ["text", "email", "number", "textarea", "file", "datetime"].includes(field.type)
+  const supportsValidation = ["text", "email", "number", "textarea", "file", "datetime", "location"].includes(
+    field.type,
+  )
 
   return (
     <div className="h-full overflow-y-auto">
@@ -173,6 +175,8 @@ export function FieldConfigPanel({ field, onUpdateField }) {
                   <SelectItem value="checkbox">Checkbox</SelectItem>
                   <SelectItem value="radio">Radio</SelectItem>
                   <SelectItem value="file">File Upload</SelectItem>
+                  <SelectItem value="datetime">Date Time</SelectItem>
+                  <SelectItem value="location">Location</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -292,93 +296,8 @@ export function FieldConfigPanel({ field, onUpdateField }) {
                   </div>
                 </div>
               )}
-              {(field.type === "text" || field.type === "textarea") && (
-                <div className="space-y-2">
-                  <Label htmlFor="field-pattern" className="text-xs">
-                    Pattern (RegEx)
-                  </Label>
-                  <Input
-                    id="field-pattern"
-                    value={field.validation?.pattern || ""}
-                    onChange={(e) => {
-                      const pattern = e.target.value.trim()
-                      let isValid = true
 
-                      if (pattern !== "") {
-                        try {
-                          new RegExp(pattern)
-                        } catch (error) {
-                          isValid = false
-                        }
-                      }
-
-                      onUpdateField(field.id, {
-                        validation: {
-                          ...field.validation,
-                          pattern: pattern,
-                          patternValid: isValid,
-                        },
-                      })
-                    }}
-                    placeholder="^[A-Za-z]+$"
-                    className={`bg-input ${field.validation?.patternValid === false ? "border-destructive" : ""}`}
-                  />
-                  {field.validation?.patternValid === false && (
-                    <div className="text-xs text-destructive">Invalid regular expression pattern</div>
-                  )}
-                  <div className="text-xs text-muted-foreground">Use regular expressions to validate input format</div>
-                </div>
-              )}
-
-              {field.type === "email" && (
-                <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
-                  Email validation is automatically applied to this field type.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Advanced Settings */}
-        {/* <Card className="border-0 shadow-none bg-transparent">
-          <CardHeader className="px-0 pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Advanced
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-0 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="field-description" className="text-sm font-medium">
-                Help Text
-              </Label>
-              <Textarea
-                id="field-description"
-                value={field.description || ""}
-                onChange={(e) => onUpdateField(field.id, { description: e.target.value })}
-                placeholder="Optional help text for users"
-                className="bg-input min-h-[60px]"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Field ID</Label>
-              <div className="flex items-center gap-2">
-                <code className="bg-muted px-2 py-1 rounded text-xs flex-1 font-mono">{field.id}</code>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 w-7 p-0"
-                  onClick={() => navigator.clipboard.writeText(field.id)}
-                >
-                  <Copy className="h-3 w-3" />
-                </Button>
-              </div>
-              <div className="text-xs text-muted-foreground">Use this ID to reference the field in your code</div>
-            </div>
-            
-          </CardContent>
-        </Card> */}
-        {field.type === "file" && (
+              {field.type === "file" && (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="field-accept" className="text-xs">
@@ -465,6 +384,7 @@ export function FieldConfigPanel({ field, onUpdateField }) {
                   </div>
                 </div>
               )}
+
               {field.type === "select" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -491,6 +411,98 @@ export function FieldConfigPanel({ field, onUpdateField }) {
                   </div>
                 </div>
               )}
+
+              {(field.type === "text" || field.type === "textarea") && (
+                <div className="space-y-2">
+                  <Label htmlFor="field-pattern" className="text-xs">
+                    Pattern (RegEx)
+                  </Label>
+                  <Input
+                    id="field-pattern"
+                    value={field.validation?.pattern || ""}
+                    onChange={(e) => {
+                      const pattern = e.target.value.trim()
+                      let isValid = true
+
+                      if (pattern !== "") {
+                        try {
+                          new RegExp(pattern)
+                        } catch (error) {
+                          isValid = false
+                        }
+                      }
+
+                      onUpdateField(field.id, {
+                        validation: {
+                          ...field.validation,
+                          pattern: pattern,
+                          patternValid: isValid,
+                        },
+                      })
+                    }}
+                    placeholder="^[A-Za-z]+$"
+                    className={`bg-input ${field.validation?.patternValid === false ? "border-destructive" : ""}`}
+                  />
+                  {field.validation?.patternValid === false && (
+                    <div className="text-xs text-destructive">Invalid regular expression pattern</div>
+                  )}
+                  <div className="text-xs text-muted-foreground">Use regular expressions to validate input format</div>
+                </div>
+              )}
+
+              {field.type === "email" && (
+                <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
+                  Email validation is automatically applied to this field type.
+                </div>
+              )}
+
+              {field.type === "location" && (
+                <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
+                  Location validation is automatically applied to this field type.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Advanced Settings */}
+        <Card className="border-0 shadow-none bg-transparent">
+          <CardHeader className="px-0 pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              Advanced
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-0 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="field-description" className="text-sm font-medium">
+                Help Text
+              </Label>
+              <Textarea
+                id="field-description"
+                value={field.description || ""}
+                onChange={(e) => onUpdateField(field.id, { description: e.target.value })}
+                placeholder="Optional help text for users"
+                className="bg-input min-h-[60px]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Field ID</Label>
+              <div className="flex items-center gap-2">
+                <code className="bg-muted px-2 py-1 rounded text-xs flex-1 font-mono">{field.id}</code>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 w-7 p-0"
+                  onClick={() => navigator.clipboard.writeText(field.id)}
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
+              <div className="text-xs text-muted-foreground">Use this ID to reference the field in your code</div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

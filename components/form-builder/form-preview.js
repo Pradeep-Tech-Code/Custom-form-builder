@@ -11,12 +11,8 @@ import { FieldRenderer } from "./field-renderer"
 export function FormPreview({ fields }) {
   const form = useForm({
     defaultValues: fields.reduce((acc, field) => {
-      const isMultiSelect = field.type === "select" && field.validation?.multiple
-      if (field.type === "location") {
-        acc[field.id] = { country: "", state: "", city: "" }
-      } else {
-        acc[field.id] = field.type === "checkbox" || isMultiSelect ? [] : field.type === "file" ? null : ""
-      }
+      acc[field.id] =
+        field.type === "checkbox" ? [] : field.type === "file" ? null : field.type === "location" ? {} : ""
       return acc
     }, {}),
     onSubmit: async ({ value }) => {
@@ -31,19 +27,22 @@ export function FormPreview({ fields }) {
 
     // Required validation
     if (field.required) {
-      const isMultiSelect = field.type === "select" && field.validation?.multiple
-      if (field.type === "location") {
-        const loc = value || {}
-        if (!loc.country || !loc.state || !loc.city) {
-          errors.push("Please select country, state and city")
-        }
-      } else if (field.type === "checkbox" || isMultiSelect) {
+      if (field.type === "checkbox") {
         if (!Array.isArray(value) || value.length === 0) {
           errors.push("This field is required")
         }
       } else if (field.type === "file") {
         if (!value) {
           errors.push("Please select a file")
+        }
+      } else if (field.type === "location") {
+        const v = value || {}
+        if (!v.country) {
+          errors.push("Please select a country")
+        } else if (!v.state) {
+          errors.push("Please select a state")
+        } else if (!v.city) {
+          errors.push("Please select a city")
         }
       } else if (!value || (typeof value === "string" && value.trim() === "")) {
         errors.push("This field is required")
@@ -142,7 +141,7 @@ export function FormPreview({ fields }) {
   }
 
   return (
-    <div className="h-full overflow-visible p-6 bg-gray-100">
+    <div className="h-full overflow-y-auto p-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">Form Preview</h2>
@@ -179,38 +178,17 @@ export function FormPreview({ fields }) {
                     },
                   }}
                 >
-                  {(fieldApi) => {
-                    const isMultiSelect = field.type === "select" && field.validation?.multiple
-                    const normalizedValue = isMultiSelect
-                      ? Array.isArray(fieldApi.state.value)
-                        ? fieldApi.state.value
-                        : []
-                      : typeof fieldApi.state.value === "string" || fieldApi.state.value == null
-                        ? fieldApi.state.value || ""
-                        : ""
-
-                    const handleNormalizedChange = (nextValue) => {
-                      if (isMultiSelect) {
-                        const arrayValue = Array.isArray(nextValue) ? nextValue : [nextValue].filter(Boolean)
-                        fieldApi.handleChange(arrayValue)
-                      } else {
-                        const stringValue = Array.isArray(nextValue) ? (nextValue[0] || "") : (nextValue ?? "")
-                        fieldApi.handleChange(stringValue)
-                      }
-                    }
-
-                    return (
-                      <div className="space-y-2">
-                        <FieldRenderer field={field} value={normalizedValue} onChange={handleNormalizedChange} />
-                        {fieldApi.state.meta.errors.length > 0 && (
-                          <div className="flex items-center gap-2 text-sm text-destructive">
-                            <AlertCircle className="h-4 w-4" />
-                            {fieldApi.state.meta.errors[0]}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  }}
+                  {(fieldApi) => (
+                    <div className="space-y-2">
+                      <FieldRenderer field={field} value={fieldApi.state.value} onChange={fieldApi.handleChange} />
+                      {fieldApi.state.meta.errors.length > 0 && (
+                        <div className="flex items-center gap-2 text-sm text-destructive">
+                          <AlertCircle className="h-4 w-4" />
+                          {fieldApi.state.meta.errors[0]}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </form.Field>
               ))}
 

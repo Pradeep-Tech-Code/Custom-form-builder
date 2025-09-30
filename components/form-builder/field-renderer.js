@@ -6,90 +6,28 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Check, ChevronsUpDown } from "lucide-react"
+
+const LOCATION_DATA = {
+  USA: {
+    California: ["Los Angeles", "San Francisco", "San Diego"],
+    Texas: ["Houston", "Dallas", "Austin"],
+    NewYork: ["New York City", "Buffalo", "Rochester"],
+  },
+  India: {
+    Maharashtra: ["Mumbai", "Pune", "Nagpur"],
+    Karnataka: ["Bengaluru", "Mysuru", "Mangaluru"],
+    Delhi: ["New Delhi", "Dwarka", "Rohini"],
+  },
+  Canada: {
+    Ontario: ["Toronto", "Ottawa", "Hamilton"],
+    Quebec: ["Montreal", "Quebec City", "Laval"],
+    BC: ["Vancouver", "Victoria", "Richmond"],
+  },
+}
 
 export function FieldRenderer({ field, value, onChange, disabled = false }) {
   const renderField = () => {
     switch (field.type) {
-      case "location": {
-        const current = value || { country: "", state: "", city: "" }
-        // Simple sample data; in real-world, fetch dynamically
-        const countries = field.locations?.countries || ["India", "USA"]
-        const statesByCountry = field.locations?.statesByCountry || {
-          India: ["Gujarat", "Maharashtra", "Rajasthan"],
-          USA: ["California", "Texas", "New York"],
-        }
-        const citiesByState = field.locations?.citiesByState || {
-          Gujarat: ["Ahmedabad", "Surat", "Vadodara"],
-          Maharashtra: ["Mumbai", "Pune", "Nagpur"],
-          Rajasthan: ["Jaipur", "Udaipur", "Jodhpur"],
-          California: ["Los Angeles", "San Francisco", "San Diego"],
-          Texas: ["Austin", "Houston", "Dallas"],
-          "New York": ["New York City", "Buffalo", "Rochester"],
-        }
-
-        const selectedCountry = current.country || ""
-        const availableStates = selectedCountry ? statesByCountry[selectedCountry] || [] : []
-        const selectedState = current.state || ""
-        const availableCities = selectedState ? citiesByState[selectedState] || [] : []
-
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <Select
-              value={selectedCountry}
-              onValueChange={(v) => onChange?.({ country: v, state: "", city: "" })}
-              disabled={disabled}
-            >
-              <SelectTrigger className="bg-input">
-                <SelectValue placeholder={field.placeholder || "Country"} />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-foreground dark:bg-slate-800 dark:text-foreground border border-border shadow-md z-[100]">
-                {countries.map((c) => (
-                  <SelectItem key={c} value={c} className="cursor-pointer">
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={selectedState}
-              onValueChange={(v) => onChange?.({ ...current, state: v, city: "" })}
-              disabled={disabled || !selectedCountry}
-            >
-              <SelectTrigger className="bg-input">
-                <SelectValue placeholder="State" />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-foreground dark:bg-slate-800 dark:text-foreground border border-border shadow-md z-[100]">
-                {availableStates.map((s) => (
-                  <SelectItem key={s} value={s} className="cursor-pointer">
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={current.city || ""}
-              onValueChange={(v) => onChange?.({ ...current, city: v })}
-              disabled={disabled || !selectedState}
-            >
-              <SelectTrigger className="bg-input">
-                <SelectValue placeholder="City" />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-foreground dark:bg-slate-800 dark:text-foreground border border-border shadow-md z-[100]">
-                {availableCities.map((ci) => (
-                  <SelectItem key={ci} value={ci} className="cursor-pointer">
-                    {ci}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )
-      }
       case "text":
         return (
           <Input
@@ -141,71 +79,53 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
 
       case "select":
         if (field.validation?.multiple) {
-          // Multi-select with Popover + Command
-          const selectedValues = Array.isArray(value) ? value : []
-          const displayLabel = selectedValues.length
-            ? `${selectedValues.length} selected`
-            : field.placeholder || "Select options"
-
+          // Multiple select using checkboxes in a dropdown-like interface
           return (
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <span className="truncate text-left">
-                    {displayLabel}
-                  </span>
-                  <ChevronsUpDown className="h-4 w-4 opacity-50" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 w-[--radix-popover-trigger-width] min-w-56 bg-white text-foreground dark:bg-slate-800 dark:text-foreground" align="start">
-                <Command>
-                  <CommandInput placeholder="Search..." />
-                  <CommandEmpty>No options found.</CommandEmpty>
-                  <CommandList>
-                    <CommandGroup>
-                      {field.options
-                        ?.filter((option) => option && option.trim() !== "")
-                        .map((option, index) => {
-                          const checked = selectedValues.includes(option)
-                          return (
-                            <CommandItem
-                              key={`${field.id}-${index}-${option}`}
-                              value={option}
-                              onSelect={() => {
-                                if (!onChange) return
-                                const current = Array.isArray(value) ? value : []
-                                if (current.includes(option)) {
-                                  onChange(current.filter((v) => v !== option))
-                                } else {
-                                  onChange([...current, option])
-                                }
-                              }}
-                            >
-                              <span className="mr-2 flex h-4 w-4 items-center justify-center">
-                                <Check className={`h-4 w-4 ${checked ? "opacity-100" : "opacity-0"}`} />
-                              </span>
-                              <span className="truncate">{option}</span>
-                            </CommandItem>
-                          )
-                        })}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <div className="space-y-2">
+              <div className="border border-input rounded-md bg-input p-2 min-h-[40px]">
+                <div className="text-sm text-muted-foreground mb-2">
+                  {Array.isArray(value) && value.length > 0
+                    ? `${value.length} selected`
+                    : field.placeholder || "Select options"}
+                </div>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {field.options
+                    ?.filter((option) => option && option.trim() !== "")
+                    .map((option, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`${field.id}-${index}`}
+                          checked={Array.isArray(value) ? value.includes(option) : false}
+                          onChange={(e) => {
+                            if (!onChange) return
+                            const currentValue = Array.isArray(value) ? value : []
+                            if (e.target.checked) {
+                              onChange([...currentValue, option])
+                            } else {
+                              onChange(currentValue.filter((v) => v !== option))
+                            }
+                          }}
+                          disabled={disabled}
+                          className="rounded border-gray-300"
+                        />
+                        <label htmlFor={`${field.id}-${index}`} className="text-sm cursor-pointer">
+                          {option}
+                        </label>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
           )
         } else {
-          // Single select with Radix Select
+          // Single select
           return (
             <Select value={value || ""} onValueChange={onChange} disabled={disabled}>
               <SelectTrigger className="bg-input">
                 <SelectValue placeholder={field.placeholder || "Select an option"} />
               </SelectTrigger>
-              <SelectContent className="bg-white text-foreground dark:bg-slate-800 dark:text-foreground border border-border shadow-md z-[100]">
+              <SelectContent className="bg-popover border border-border shadow-md z-50">
                 {field.options
                   ?.filter((option) => option && option.trim() !== "")
                   .map((option, index) => (
@@ -287,6 +207,75 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
             max={field.validation?.max}
           />
         )
+
+      case "location": {
+        const current = value || {}
+        const countries = Object.keys(LOCATION_DATA)
+        const states = current.country ? Object.keys(LOCATION_DATA[current.country] || {}) : []
+        const cities = current.country && current.state ? LOCATION_DATA[current.country]?.[current.state] || [] : []
+
+        const handleCountry = (country) => {
+          onChange?.({ country, state: undefined, city: undefined })
+        }
+        const handleState = (state) => {
+          onChange?.({ country: current.country, state, city: undefined })
+        }
+        const handleCity = (city) => {
+          onChange?.({ country: current.country, state: current.state, city })
+        }
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <Label className="text-xs text-muted-foreground">Country</Label>
+              <Select value={current.country || ""} onValueChange={handleCountry} disabled={disabled}>
+                <SelectTrigger className="bg-input">
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border">
+                  {countries.map((c) => (
+                    <SelectItem key={c} value={c} className="hover:bg-accent">
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">State</Label>
+              <Select value={current.state || ""} onValueChange={handleState} disabled={disabled || !current.country}>
+                <SelectTrigger className="bg-input">
+                  <SelectValue placeholder={current.country ? "Select state" : "Select country first"} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border">
+                  {states.map((s) => (
+                    <SelectItem key={s} value={s} className="hover:bg-accent">
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground">City</Label>
+              <Select value={current.city || ""} onValueChange={handleCity} disabled={disabled || !current.state}>
+                <SelectTrigger className="bg-input">
+                  <SelectValue placeholder={current.state ? "Select city" : "Select state first"} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border">
+                  {cities.map((city) => (
+                    <SelectItem key={city} value={city} className="hover:bg-accent">
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )
+      }
 
       default:
         return <div className="text-muted-foreground">Unknown field type</div>

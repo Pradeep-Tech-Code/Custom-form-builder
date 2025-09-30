@@ -15,6 +15,7 @@ import {
   PanelLeft,
   Lock,
   Unlock,
+  MapPin,
 } from "lucide-react"
 
 const fieldTypes = [
@@ -27,6 +28,7 @@ const fieldTypes = [
   { type: "radio", label: "Radio", icon: Circle, description: "Single choice" },
   { type: "file", label: "File Upload", icon: Upload, description: "File attachment" },
   { type: "datetime", label: "Date Time", icon: Calendar, description: "Date and time picker" },
+  { type: "location", label: "Location", icon: MapPin, description: "Country → State → City" }, // new type
 ]
 
 export function FieldPalette({ onAddField, collapsed = false, locked = false, onToggleCollapse, onToggleLock }) {
