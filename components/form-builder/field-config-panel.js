@@ -244,7 +244,7 @@ export function FieldConfigPanel({ field, onUpdateField }) {
         )}
 
         {/* Validation */}
-        {supportsValidation && (
+        {/* {supportsValidation && (
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader className="px-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -463,10 +463,10 @@ export function FieldConfigPanel({ field, onUpdateField }) {
               )}
             </CardContent>
           </Card>
-        )}
+        )} */}
 
         {/* Advanced Settings */}
-        <Card className="border-0 shadow-none bg-transparent">
+        {/* <Card className="border-0 shadow-none bg-transparent">
           <CardHeader className="px-0 pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
               Advanced
@@ -502,7 +502,7 @@ export function FieldConfigPanel({ field, onUpdateField }) {
               <div className="text-xs text-muted-foreground">Use this ID to reference the field in your code</div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   )

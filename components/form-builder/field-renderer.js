@@ -25,6 +25,14 @@ const LOCATION_DATA = {
   },
 }
 
+const PHONE_COUNTRIES = [
+  { code: "US", label: "United States", dial: "+1", len: 10 },
+  { code: "IN", label: "India", dial: "+91", len: 10 },
+  { code: "GB", label: "United Kingdom", dial: "+44", len: 10 },
+  { code: "CA", label: "Canada", dial: "+1", len: 10 },
+  { code: "AU", label: "Australia", dial: "+61", len: 9 },
+]
+
 export function FieldRenderer({ field, value, onChange, disabled = false }) {
   const renderField = () => {
     switch (field.type) {
@@ -125,7 +133,7 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
               <SelectTrigger className="bg-input">
                 <SelectValue placeholder={field.placeholder || "Select an option"} />
               </SelectTrigger>
-              <SelectContent className="bg-popover border border-border shadow-md z-50">
+              <SelectContent className="bg-background text-foreground border border-border shadow-md z-50">
                 {field.options
                   ?.filter((option) => option && option.trim() !== "")
                   .map((option, index) => (
@@ -232,7 +240,7 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
                 <SelectTrigger className="bg-input">
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border border-border">
+                <SelectContent className="bg-background text-foreground border border-border">
                   {countries.map((c) => (
                     <SelectItem key={c} value={c} className="hover:bg-accent">
                       {c}
@@ -248,7 +256,7 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
                 <SelectTrigger className="bg-input">
                   <SelectValue placeholder={current.country ? "Select state" : "Select country first"} />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border border-border">
+                <SelectContent className="bg-background text-foreground border border-border">
                   {states.map((s) => (
                     <SelectItem key={s} value={s} className="hover:bg-accent">
                       {s}
@@ -264,7 +272,7 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
                 <SelectTrigger className="bg-input">
                   <SelectValue placeholder={current.state ? "Select city" : "Select state first"} />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border border-border">
+                <SelectContent className="bg-background text-foreground border border-border">
                   {cities.map((city) => (
                     <SelectItem key={city} value={city} className="hover:bg-accent">
                       {city}
@@ -273,6 +281,45 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        )
+      }
+
+      case "phone": {
+        const current = value || {}
+        const country = current.country || "US"
+        const number = current.number || ""
+        const handleCountry = (c) => onChange?.({ country: c, number })
+        const handleNumber = (val) => {
+          // keep raw input but pass along; validation strips non-digits
+          onChange?.({ country, number: val })
+        }
+
+        return (
+          <div className="grid grid-cols-[120px_1fr] gap-2">
+            <Select value={country} onValueChange={handleCountry} disabled={disabled}>
+              <SelectTrigger className="bg-input">
+                <SelectValue placeholder="CC" />
+              </SelectTrigger>
+              <SelectContent className="bg-background text-foreground border border-border">
+                {PHONE_COUNTRIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code} className="hover:bg-accent">
+                    {c.dial} {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Input
+              type="tel"
+              inputMode="tel"
+              placeholder={field.placeholder || "Phone number"}
+              value={number}
+              onChange={(e) => handleNumber(e.target.value)}
+              disabled={disabled}
+              className="bg-input"
+              aria-label="Phone number"
+            />
           </div>
         )
       }
@@ -289,6 +336,9 @@ export function FieldRenderer({ field, value, onChange, disabled = false }) {
         {field.required && <span className="text-destructive ml-1">*</span>}
       </Label>
       {renderField()}
+      {field.type === "phone" && (
+        <p className="text-xs text-muted-foreground">Select country code, then enter local number (digits only).</p>
+      )}
       {field.validation?.pattern && (
         <p className="text-xs text-muted-foreground">Pattern: {field.validation.pattern}</p>
       )}

@@ -11,16 +11,34 @@ import { FieldRenderer } from "./field-renderer"
 export function FormPreview({ fields }) {
   const form = useForm({
     defaultValues: fields.reduce((acc, field) => {
-      acc[field.id] =
-        field.type === "checkbox" ? [] : field.type === "file" ? null : field.type === "location" ? {} : ""
+      let initialValue = ""
+      if (field.type === "checkbox") {
+        initialValue = []
+      } else if (field.type === "select" && field.validation?.multiple) {
+        initialValue = [] // multi-select starts as array
+      } else if (field.type === "file") {
+        initialValue = null
+      } else if (field.type === "location") {
+        initialValue = {}
+      } else if (field.type === "phone") {
+        initialValue = {} // { country, number }
+      }
+      acc[field.id] = initialValue
       return acc
     }, {}),
     onSubmit: async ({ value }) => {
-      // Simulate form submission
       console.log("Form submitted:", value)
       alert("Form submitted successfully! Check the console for values.")
     },
   })
+
+  const PHONE_COUNTRIES = {
+    US: { dial: "+1", len: 10 },
+    IN: { dial: "+91", len: 10 },
+    GB: { dial: "+44", len: 10 },
+    CA: { dial: "+1", len: 10 },
+    AU: { dial: "+61", len: 9 },
+  }
 
   const validateField = (field, value) => {
     const errors = []
@@ -43,6 +61,17 @@ export function FormPreview({ fields }) {
           errors.push("Please select a state")
         } else if (!v.city) {
           errors.push("Please select a city")
+        }
+      } else if (field.type === "phone") {
+        const v = value || {}
+        if (!v.country) {
+          errors.push("Please select a country code")
+        } else if (!v.number || String(v.number).trim() === "") {
+          errors.push("Please enter a phone number")
+        }
+      } else if (field.type === "select" && field.validation?.multiple) {
+        if (!Array.isArray(value) || value.length === 0) {
+          errors.push("Please select at least one option")
         }
       } else if (!value || (typeof value === "string" && value.trim() === "")) {
         errors.push("This field is required")
@@ -75,7 +104,7 @@ export function FormPreview({ fields }) {
     }
 
     // Type-specific validation
-    if (value && typeof value === "string" && value.trim() !== "") {
+    if (value && ((typeof value === "string" && value.trim() !== "") || field.type === "phone")) {
       switch (field.type) {
         case "email":
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -115,6 +144,24 @@ export function FormPreview({ fields }) {
             }
           }
           break
+
+        case "phone": {
+          const v = value || {}
+          const meta = PHONE_COUNTRIES[v.country || "US"]
+          const digits = String(v.number || "").replace(/\D/g, "")
+          const minLen =
+            typeof field.validation?.minLength === "number" ? field.validation.minLength : (meta?.len ?? 10)
+          const maxLen =
+            typeof field.validation?.maxLength === "number" ? field.validation.maxLength : (meta?.len ?? 10)
+          if (digits.length < minLen || digits.length > maxLen) {
+            if (minLen === maxLen) {
+              errors.push(`Phone number must be ${minLen} digits for ${v.country || "selected country"}`)
+            } else {
+              errors.push(`Phone number must be ${minLen}-${maxLen} digits`)
+            }
+          }
+          break
+        }
       }
     }
 
