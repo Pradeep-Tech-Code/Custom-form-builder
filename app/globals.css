@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Updated to a vibrant professional color scheme with blue primary and orange accents */
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #f8fafc;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #2563eb; /* Professional blue */
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #475569;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #f97316; /* Vibrant orange accent */
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #ffffff;
+  --ring: #2563eb;
+  --chart-1: #2563eb; /* Blue */
+  --chart-2: #f97316; /* Orange */
+  --chart-3: #8b5cf6; /* Purple */
+  --chart-4: #10b981; /* Green */
+  --chart-5: #f59e0b; /* Amber */
+  --radius: 0.5rem;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #3b82f6;
+}
+
+.dark {
+  /* Enhanced dark mode with vibrant blue and orange accents */
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+  --primary: #3b82f6; /* Bright blue */
+  --primary-foreground: #ffffff;
+  --secondary: #334155;
+  --secondary-foreground: #cbd5e1;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #fb923c; /* Bright orange */
+  --accent-foreground: #ffffff;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #1e293b;
+  --ring: #3b82f6;
+  --chart-1: #3b82f6; /* Bright blue */
+  --chart-2: #fb923c; /* Bright orange */
+  --chart-3: #a78bfa; /* Bright purple */
+  --chart-4: #34d399; /* Bright green */
+  --chart-5: #fbbf24; /* Bright amber */
+  --radius: 0.5rem;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #3b82f6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Enhanced custom styles with more vibrant colors for better visual hierarchy */
+@layer components {
+  .form-builder-sidebar {
+    @apply bg-gradient-to-b from-blue-50 to-indigo-100 border-r border-blue-200 shadow-lg;
+  }
+
+  .form-builder-header {
+    @apply bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 border-b border-blue-300 shadow-lg;
+  }
+
+  .field-type-button {
+    @apply hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 border border-transparent bg-white/50 hover:shadow-md;
+  }
+
+  .field-type-button:hover .field-icon {
+    @apply text-blue-700;
+  }
+
+  .form-canvas {
+    @apply bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-50;
+  }
+
+  .config-panel {
+    @apply bg-gradient-to-b from-orange-50 via-amber-50 to-yellow-50 border-l border-orange-200 shadow-lg;
+  }
+
+  /* Added main container background override */
+  .form-builder-main {
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50;
+  }
+
+  /* Fixed select dropdown styling to prevent transparency issues */
+  .select-content {
+    @apply bg-popover border border-border shadow-lg z-50;
+  }
+
+  .select-item {
+    @apply bg-popover hover:bg-accent hover:text-accent-foreground cursor-pointer;
+  }
+}
+
+/* Added specific fixes for select dropdown visibility */
+[data-radix-select-content] {
+  background-color: hsl(var(--popover)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  z-index: 50 !important;
+}
+
+[data-radix-select-item] {
+  background-color: transparent !important;
+}
+
+[data-radix-select-item]:hover,
+[data-radix-select-item][data-highlighted] {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
